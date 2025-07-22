@@ -1,0 +1,22 @@
+@ReviewMetricsProcessor_HostAddress = http://localhost:5000
+
+POST {{ReviewMetricsProcessor_HostAddress}}/api/reviews/
+Accept: application/json
+Content-Type: application/json
+[{
+  "type":"ReviewStarted",
+  "reviewId":"review_000000",
+  "authorId":"dev_005",
+  "timestamp":"2025-06-27T16:44:38+02:00"
+}]
+###
+POST {{ReviewMetricsProcessor_HostAddress}}/api/reviews/
+Accept: application/json
+Content-Type: application/json
+[{
+  "type": "ReviewCompleted",
+  "reviewId": "12345",
+  "authorId": "john",
+  "timestamp": "2023-10-02T16:30:00Z",
+  "linesOfCodeReviewed": 160
+}]
