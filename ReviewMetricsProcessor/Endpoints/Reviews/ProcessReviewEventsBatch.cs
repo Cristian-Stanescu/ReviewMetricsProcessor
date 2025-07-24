@@ -30,7 +30,8 @@ public class ProcessReviewEventsBatch
                 }
             }
 
-            foreach (var reviewEvent in reviewEvents.Except(invalidEvents))
+            var validEvents = reviewEvents.Except(invalidEvents).ToList();
+            foreach (var reviewEvent in validEvents)
             {
                 switch (reviewEvent.Type)
                 {
@@ -49,11 +50,11 @@ public class ProcessReviewEventsBatch
                         break;
                     default:
                         logger.LogWarning("Invalid review event type: {Type}", reviewEvent.Type);
-                        return TypedResults.BadRequest("Invalid review event type.");
+                        break;
                 }
             }
 
-            logger.LogInformation("Successfully queued {Count} review events for processing", reviewEvents.Count);
+            logger.LogInformation("Successfully queued {Count} review events for processing", validEvents.Count);
             return TypedResults.Ok();
         }
         catch (Exception ex)
