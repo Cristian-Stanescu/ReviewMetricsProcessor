@@ -13,7 +13,7 @@ public class ReviewStartedConsumerTests : IDisposable
     private readonly ReviewMetricsDbContext _dbContext;
     private readonly ILogger<ReviewStartedConsumer> _logger;
     private readonly ReviewStartedConsumer _consumer;
-    private readonly ConsumeContext<ReviewStartedMessage> _context;
+    private readonly ConsumeContext<ReviewStarted> _context;
 
     public ReviewStartedConsumerTests()
     {
@@ -24,7 +24,7 @@ public class ReviewStartedConsumerTests : IDisposable
         _dbContext = new ReviewMetricsDbContext(options);
         _logger = Substitute.For<ILogger<ReviewStartedConsumer>>();
         _consumer = new ReviewStartedConsumer(_dbContext, _logger);
-        _context = Substitute.For<ConsumeContext<ReviewStartedMessage>>();
+        _context = Substitute.For<ConsumeContext<ReviewStarted>>();
     }
 
     public void Dispose()
@@ -38,7 +38,7 @@ public class ReviewStartedConsumerTests : IDisposable
     {
         // Arrange
         var timestamp = DateTime.UtcNow;
-        var message = new ReviewStartedMessage("review1", "author1", timestamp);
+        var message = new ReviewStarted("review1", "author1", timestamp);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -78,7 +78,7 @@ public class ReviewStartedConsumerTests : IDisposable
         await _dbContext.SaveChangesAsync();
 
         var newTimestamp = DateTime.UtcNow;
-        var message = new ReviewStartedMessage("review2", "author1", newTimestamp);
+        var message = new ReviewStarted("review2", "author1", newTimestamp);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -119,7 +119,7 @@ public class ReviewStartedConsumerTests : IDisposable
         await _dbContext.SaveChangesAsync();
 
         var newTimestamp = DateTime.UtcNow;
-        var message = new ReviewStartedMessage("review1", "author1", newTimestamp);
+        var message = new ReviewStarted("review1", "author1", newTimestamp);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -148,9 +148,9 @@ public class ReviewStartedConsumerTests : IDisposable
         var timestamp2 = DateTime.UtcNow.AddMinutes(-5);
         var timestamp3 = DateTime.UtcNow;
 
-        var message1 = new ReviewStartedMessage("review1", "author1", timestamp1);
-        var message2 = new ReviewStartedMessage("review2", "author1", timestamp2);
-        var message3 = new ReviewStartedMessage("review3", "author1", timestamp3);
+        var message1 = new ReviewStarted("review1", "author1", timestamp1);
+        var message2 = new ReviewStarted("review2", "author1", timestamp2);
+        var message3 = new ReviewStarted("review3", "author1", timestamp3);
 
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -183,8 +183,8 @@ public class ReviewStartedConsumerTests : IDisposable
     {
         // Arrange
         var timestamp = DateTime.UtcNow;
-        var message1 = new ReviewStartedMessage("review1", "author1", timestamp);
-        var message2 = new ReviewStartedMessage("review2", "author2", timestamp.AddMinutes(5));
+        var message1 = new ReviewStarted("review1", "author1", timestamp);
+        var message2 = new ReviewStarted("review2", "author2", timestamp.AddMinutes(5));
 
         _context.CancellationToken.Returns(CancellationToken.None);
 

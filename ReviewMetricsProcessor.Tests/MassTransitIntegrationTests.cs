@@ -51,14 +51,14 @@ public class MassTransitIntegrationTests : IAsyncDisposable
 
         try
         {
-            var message = new ReviewStartedMessage("review1", "author1", DateTime.UtcNow);
+            var message = new ReviewStarted("review1", "author1", DateTime.UtcNow);
 
             // Act
             await harness.Bus.Publish(message);
 
             // Wait for message processing
-            Assert.True(await harness.Published.Any<ReviewStartedMessage>());
-            Assert.True(await harness.Consumed.Any<ReviewStartedMessage>());
+            Assert.True(await harness.Published.Any<ReviewStarted>());
+            Assert.True(await harness.Consumed.Any<ReviewStarted>());
 
             // Give a moment for database operations to complete
             await Task.Delay(200);
@@ -119,14 +119,14 @@ public class MassTransitIntegrationTests : IAsyncDisposable
                 await setupDbContext.SaveChangesAsync();
             }
 
-            var message = new ReviewCompletedMessage("review1", "author1", completionTime, 150);
+            var message = new ReviewCompleted("review1", "author1", completionTime, 150);
 
             // Act
             await harness.Bus.Publish(message);
 
             // Wait for message processing
-            Assert.True(await harness.Published.Any<ReviewCompletedMessage>());
-            Assert.True(await harness.Consumed.Any<ReviewCompletedMessage>());
+            Assert.True(await harness.Published.Any<ReviewCompleted>());
+            Assert.True(await harness.Consumed.Any<ReviewCompleted>());
 
             // Give a moment for database operations to complete
             await Task.Delay(200);
@@ -164,16 +164,16 @@ public class MassTransitIntegrationTests : IAsyncDisposable
 
         try
         {
-            var message = new ReviewCompletedMessage("review1", "nonexistent", DateTime.UtcNow, 100);
+            var message = new ReviewCompleted("review1", "nonexistent", DateTime.UtcNow, 100);
 
             // Act & Assert
             await harness.Bus.Publish(message);
 
-            Assert.True(await harness.Published.Any<ReviewCompletedMessage>());
+            Assert.True(await harness.Published.Any<ReviewCompleted>());
 
             // The consumer should handle the error (we expect it to fail)
             var consumerHarness = harness.GetConsumerHarness<ReviewCompletedConsumer>();
-            Assert.True(await consumerHarness.Consumed.Any<ReviewCompletedMessage>());
+            Assert.True(await consumerHarness.Consumed.Any<ReviewCompleted>());
 
             // Since the consumer throws an exception, MassTransit will retry and eventually move to error queue
             // We can verify that the consumer processed the message (even if it failed)
@@ -196,15 +196,15 @@ public class MassTransitIntegrationTests : IAsyncDisposable
             var startTime = DateTime.UtcNow.AddHours(-1);
             var completionTime = DateTime.UtcNow;
 
-            var startMessage = new ReviewStartedMessage("review1", "author1", startTime);
-            var completeMessage = new ReviewCompletedMessage("review1", "author1", completionTime, 250);
+            var startMessage = new ReviewStarted("review1", "author1", startTime);
+            var completeMessage = new ReviewCompleted("review1", "author1", completionTime, 250);
 
             // Act
             await harness.Bus.Publish(startMessage);
 
             // Wait for the first message to be processed
-            Assert.True(await harness.Published.Any<ReviewStartedMessage>());
-            Assert.True(await harness.Consumed.Any<ReviewStartedMessage>());
+            Assert.True(await harness.Published.Any<ReviewStarted>());
+            Assert.True(await harness.Consumed.Any<ReviewStarted>());
 
             // Give time for database operations
             await Task.Delay(200);
@@ -212,8 +212,8 @@ public class MassTransitIntegrationTests : IAsyncDisposable
             await harness.Bus.Publish(completeMessage);
 
             // Wait for the second message to be processed
-            Assert.True(await harness.Published.Any<ReviewCompletedMessage>());
-            Assert.True(await harness.Consumed.Any<ReviewCompletedMessage>());
+            Assert.True(await harness.Published.Any<ReviewCompleted>());
+            Assert.True(await harness.Consumed.Any<ReviewCompleted>());
 
             // Give time for database operations
             await Task.Delay(200);

@@ -6,9 +6,9 @@ using ReviewMetricsProcessor.Messages;
 
 namespace ReviewMetricsProcessor.Consumers;
 
-public class ReviewStartedConsumer(ReviewMetricsDbContext dbContext, ILogger<ReviewStartedConsumer> logger) : IConsumer<ReviewStartedMessage>
+public class ReviewStartedConsumer(ReviewMetricsDbContext dbContext, ILogger<ReviewStartedConsumer> logger) : IConsumer<ReviewStarted>
 {
-    public async Task Consume(ConsumeContext<ReviewStartedMessage> context)
+    public async Task Consume(ConsumeContext<ReviewStarted> context)
     {
         var message = context.Message;
         logger.LogInformation("Processing ReviewStarted for ReviewId: {ReviewId}, AuthorId: {AuthorId}", 

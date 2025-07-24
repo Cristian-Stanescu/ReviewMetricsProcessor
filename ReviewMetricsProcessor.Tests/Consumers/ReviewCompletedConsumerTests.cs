@@ -13,7 +13,7 @@ public class ReviewCompletedConsumerTests : IDisposable
     private readonly ReviewMetricsDbContext _dbContext;
     private readonly ILogger<ReviewCompletedConsumer> _logger;
     private readonly ReviewCompletedConsumer _consumer;
-    private readonly ConsumeContext<ReviewCompletedMessage> _context;
+    private readonly ConsumeContext<ReviewCompleted> _context;
 
     public ReviewCompletedConsumerTests()
     {
@@ -24,7 +24,7 @@ public class ReviewCompletedConsumerTests : IDisposable
         _dbContext = new ReviewMetricsDbContext(options);
         _logger = Substitute.For<ILogger<ReviewCompletedConsumer>>();
         _consumer = new ReviewCompletedConsumer(_dbContext, _logger);
-        _context = Substitute.For<ConsumeContext<ReviewCompletedMessage>>();
+        _context = Substitute.For<ConsumeContext<ReviewCompleted>>();
     }
 
     public void Dispose()
@@ -58,7 +58,7 @@ public class ReviewCompletedConsumerTests : IDisposable
         _dbContext.Authors.Add(existingAuthor);
         await _dbContext.SaveChangesAsync();
 
-        var message = new ReviewCompletedMessage("review1", "author1", completionTime, linesOfCode);
+        var message = new ReviewCompleted("review1", "author1", completionTime, linesOfCode);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -89,7 +89,7 @@ public class ReviewCompletedConsumerTests : IDisposable
     public async Task Consume_WithNonExistentAuthor_ThrowsInvalidOperationException()
     {
         // Arrange
-        var message = new ReviewCompletedMessage("review1", "nonexistent-author", DateTime.UtcNow, 100);
+        var message = new ReviewCompleted("review1", "nonexistent-author", DateTime.UtcNow, 100);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -114,7 +114,7 @@ public class ReviewCompletedConsumerTests : IDisposable
         _dbContext.Authors.Add(existingAuthor);
         await _dbContext.SaveChangesAsync();
 
-        var message = new ReviewCompletedMessage("nonexistent-review", "author1", DateTime.UtcNow, 100);
+        var message = new ReviewCompleted("nonexistent-review", "author1", DateTime.UtcNow, 100);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -148,7 +148,7 @@ public class ReviewCompletedConsumerTests : IDisposable
         _dbContext.Authors.Add(existingAuthor);
         await _dbContext.SaveChangesAsync();
 
-        var message = new ReviewCompletedMessage("review1", "author1", DateTime.UtcNow, 100);
+        var message = new ReviewCompleted("review1", "author1", DateTime.UtcNow, 100);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 
@@ -187,7 +187,7 @@ public class ReviewCompletedConsumerTests : IDisposable
         _dbContext.Authors.Add(existingAuthor);
         await _dbContext.SaveChangesAsync();
 
-        var message = new ReviewCompletedMessage("review2", "author1", baseTime.AddHours(2), 200);
+        var message = new ReviewCompleted("review2", "author1", baseTime.AddHours(2), 200);
         _context.Message.Returns(message);
         _context.CancellationToken.Returns(CancellationToken.None);
 

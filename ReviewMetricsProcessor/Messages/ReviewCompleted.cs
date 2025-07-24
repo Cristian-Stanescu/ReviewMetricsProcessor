@@ -1,6 +1,6 @@
 namespace ReviewMetricsProcessor.Messages;
 
-public record ReviewCompletedMessage(
+public record ReviewCompleted(
     string ReviewId,
     string AuthorId,
     DateTime Timestamp,

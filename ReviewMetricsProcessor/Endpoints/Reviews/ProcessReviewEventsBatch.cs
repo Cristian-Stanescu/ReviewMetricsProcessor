@@ -43,13 +43,13 @@ public class ProcessReviewEventsBatch
                 switch (reviewEvent.Type)
                 {
                     case "ReviewStarted":
-                        await bus.Publish(new ReviewStartedMessage(
+                        await bus.Publish(new ReviewStarted(
                             reviewEvent.ReviewId,
                             reviewEvent.AuthorId,
                             reviewEvent.Timestamp), ct);
                         break;
                     case "ReviewCompleted":
-                        await bus.Publish(new ReviewCompletedMessage(
+                        await bus.Publish(new ReviewCompleted(
                             reviewEvent.ReviewId,
                             reviewEvent.AuthorId,
                             reviewEvent.Timestamp,
