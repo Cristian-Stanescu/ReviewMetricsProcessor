@@ -19,26 +19,18 @@ public class ProcessReviewEventsBatch
 
         try
         {
-            // Validate all review events first
-            var validationErrors = new List<string>();
-            for (int i = 0; i < reviewEvents.Count; i++)
+            var invalidEvents = new List<ReviewEvent>();
+            foreach (var reviewEvent in reviewEvents)
             {
-                var validationResult = await validator.ValidateAsync(reviewEvents[i], ct);
+                var validationResult = await validator.ValidateAsync(reviewEvent, ct);
                 if (!validationResult.IsValid)
                 {
-                    var errors = validationResult.Errors.Select(e => $"Event {i}: {e.ErrorMessage}");
-                    validationErrors.AddRange(errors);
+                    logger.LogWarning("Invalid review event: {Event}", reviewEvent);
+                    invalidEvents.Add(reviewEvent);
                 }
             }
 
-            if (validationErrors.Any())
-            {
-                var errorMessage = string.Join("; ", validationErrors);
-                logger.LogWarning("Validation failed for review events: {Errors}", errorMessage);
-                return TypedResults.BadRequest($"Validation failed: {errorMessage}");
-            }
-
-            foreach (var reviewEvent in reviewEvents)
+            foreach (var reviewEvent in reviewEvents.Except(invalidEvents))
             {
                 switch (reviewEvent.Type)
                 {
